@@ -34,7 +34,7 @@ class killbots:
 
         self.round = 1
         self.score = 0
-        self.energy = 0
+        self.energy = 5
         self.populate(8)
         self.isDead = False
         
@@ -47,9 +47,33 @@ class killbots:
             if self.land[x][y]==0 : break
         return x,y
 
-    
 
-    
+    def is_in_bord(self, x,y):
+        if ( x >= 0
+             and x < self.row
+             and y >= 0
+             and y < self.col) :
+            return True
+        return False
+
+    def can_push(self, action):
+        mx=0
+        if isUp(action) : mx=-1
+        if isDown(action) : mx = 1
+        my=0
+        if isLeft(action) : my = -1
+        if isRight(action) : my = 1
+        x,y = mx, my
+        
+        while(self.land[self.hx+x][self.hy+y] == 4
+              and  self.is_in_bord(self.hx+x,self.hy+y)):
+            x += mx
+            y += my
+        if (self.is_in_bord(self.hx+x, self.hy+y)
+            and self.land[self.hx+x][self.hy+y]>0 ):
+            return True
+        return False
+            
     def populate(self, N_bot):
         self.land = numpy.zeros((self.row, self.col),
                                 dtype=numpy.uint8)
@@ -90,6 +114,13 @@ class killbots:
             or (isRight(action) and action<9 and self.hy == self.col-1)
             ) : return -1
 
+        if action == 10 :
+            x,y = self.empty_rnd_cell()
+            self.land[self.hx][self.hy] = 0
+            self.hx = x
+            self.hy = y
+            self.land[x][y] = 1
+        
         mx=0
         if isUp(action) : mx=-1
         if isDown(action) : mx = 1
@@ -101,8 +132,24 @@ class killbots:
             self.hx += mx
             self.hy += my
             self.land[self.hx][self.hy] = 1
+        elif ( self.land[self.hx + mx][self.hy + my] == 4
+               and self.can_push(action)):
+            #Check and manage pushing the junk
+            x,y = mx, my
         
-        
+            while(self.land[self.hx+x][self.hy+y] == 4
+                  and  self.is_in_bord(self.hx+x,self.hy+y)):
+                x += mx
+                y += my
+
+            while ( x > 0 or y > 0):
+                self.land[self.hx+x+mx][self.hy+y+my] = self.land[self.hx+x][self.hy+y]
+                x -= mx
+                y -= my
+            self.land[self.hx][self.hy] = 0
+            self.hx += mx
+            self.hy += my
+                
         self.move_bot()
         if self.isDead : return 0
         else :return 1
