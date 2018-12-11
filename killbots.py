@@ -69,9 +69,9 @@ class killbots:
               and  self.is_in_bord(self.hx+x,self.hy+y)):
             x += mx
             y += my
-        if (self.is_in_bord(self.hx+x, self.hy+y)
-            and self.land[self.hx+x][self.hy+y]>0 ):
+        if (self.is_in_bord(self.hx+x, self.hy+y)):
             return True
+
         return False
             
     def populate(self, N_bot):
@@ -135,22 +135,33 @@ class killbots:
         elif ( self.land[self.hx + mx][self.hy + my] == 4
                and self.can_push(action)):
             #Check and manage pushing the junk
+
             x,y = mx, my
         
             while(self.land[self.hx+x][self.hy+y] == 4
                   and  self.is_in_bord(self.hx+x,self.hy+y)):
                 x += mx
                 y += my
-
-            while ( x > 0 or y > 0):
-                self.land[self.hx+x+mx][self.hy+y+my] = self.land[self.hx+x][self.hy+y]
+            if (self.land[self.hx+x][self.hy+y] == 2 or self.land[self.hx+x][self.hy+y] == 4):
+                if self.energy< self._max_energy == 12:
+                    self.energy += 1
+                else :
+                    self.score += _energy_points
+                
+            while ( abs(x) > 0 or abs(y) > 0):
+                self.land[self.hx+x][self.hy+y] = self.land[self.hx+x-mx][self.hy+y-my]
                 x -= mx
                 y -= my
+
+            
             self.land[self.hx][self.hy] = 0
             self.hx += mx
             self.hy += my
-                
+
+
+        
         self.move_bot()
+        
         if self.isDead : return 0
         else :return 1
   
@@ -169,31 +180,55 @@ class killbots:
                                 dtype=numpy.uint8)
         for xy in keep_item :
             new_land[xy[0]][xy[1]] = self.land[xy[0]][xy[1]]
-        
+
+        print new_land
         print bot_xy
         for xy in bot_xy:
             print xy, xy[0], xy[1], "  :",
             mx = xy[0] + numpy.sign(self.hx-xy[0])
             my = xy[1] + numpy.sign(self.hy-xy[1])
             print mx, " , ", my 
-            self.land[xy[0]][xy[1]] = 0            
+                      
             if new_land[mx][my] > 0 :
                 if new_land[mx][my] == 1 :
                     self.isDead = True
+                else :
+                    #score
+                    if new_land[mx][my] == 2 : self.score += self._bot_points
+                    if new_land[mx][my] == 3 : self.score += self._fastbot_points
+                    if is_fastbot : self.score +=  self._fastbot_points
+                    else : self.score += self._bot_points
+                    
                 new_land[mx][my] = 4
+
+                
             else :
                 new_land[mx][my] = bot
         self.land = numpy.copy(new_land)     
         
-        
 
+#Fonction de test
+def map_push1(a):
+    a.land = numpy.zeros((a.row, a.col), dtype=numpy.uint8)
+    a.land[a.row/2][a.col/2] = 1
+    a.hx = a.row / 2
+    a.hy = a.col / 2
+    a.land[6][7] = 2
+    a.land[6][9] = 2
+    a.land[0][8] = 2   
 
-a = killbots()
-print a.land
-while not(a.isDead):
-    print "----------------------------"
-    print "Action :"
-    action = input("Action ?")
-    a.play(action)    
+def main():
+    a = killbots()
+    #map_push1(a)
     print a.land
+    while not(a.isDead):
+        print "----------------------------"
+        print "Action :"
+        action = input("Action ?")
+        a.play(action)    
+        print a.land
+        print "Score : ", a.score, "  | Energy :", a.energy
 
+if __name__ == "__main__":
+    # execute only if run as a script
+    main()
