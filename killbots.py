@@ -19,6 +19,8 @@ class killbots:
     _bot_points = 5
     _fastbot_points = 10
     _energy_points = 5
+    _initial_bot = 8
+    _initial_fastbot = -2
 
     def __init__(self, row = 16, col = 16, graph = True):
         self.hx = row / 2
@@ -35,7 +37,7 @@ class killbots:
         self.round = 1
         self.score = 0
         self.energy = 5
-        self.populate(8)
+        self.populate(self._initial_bot)
         self.isDead = False
         
 
@@ -219,7 +221,7 @@ def map_push1(a):
 
 def main():
     a = killbots()
-    #map_push1(a)
+    map_push1(a)
     print a.land
     while not(a.isDead):
         print "----------------------------"
