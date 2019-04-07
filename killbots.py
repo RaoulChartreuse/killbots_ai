@@ -207,8 +207,126 @@ class killbots:
             else :
                 new_land[mx][my] = bot
         self.land = numpy.copy(new_land)     
-        
 
+    def teleport_safely(self):
+        """
+        Comme dans le code original on choisi un depart puis on verifie pour chaque case si elle est safe
+        """
+        x_start = numpy.random.randint(self.row)
+        y_start = numpy.random.randint(self.col)
+
+        x,y = x_start, y_start
+        
+        while True:
+            #Incermentation
+            if x < self.row -1 :
+                x += 1
+            else:
+                x = 0
+                if y < self.col -1:
+                    y += 1
+                else :
+                    y = 0
+
+            #Test :
+            if self.safe_teleport(x, y):
+                return x, y
+            if x == x_start and y == y_start:
+                return self.hx, self.hy #Pas de teleportation
+
+    def safe_teleport(self, x, y):
+        """The search of safe_teleport spot is not factorized.
+        This is done on purpose to not hide the logic
+        """
+        #On regarde si la casse est vide :
+        #Ainsi on ne se teleporte pas a la meme position
+        if self.land[x][y] !=0 : return False
+
+        #On regarde à 1 case de distance si il n'y a pas de bot
+        if x>0 : 
+            if self.land[x-1][y] == 2 or self.land[x-1][y] == 3 : return False
+            if y>0 :
+                if self.land[x-1][y-1] == 2 or self.land[x-1][y-1] == 3 : return False
+            if y < self.col -1:
+                if self.land[x-1][y+1] == 2 or self.land[x-1][y+1] == 3 : return False
+        if y>0 :
+            if self.land[x][y-1] == 2 or self.land[x][y-1] == 3 : return False
+        if y < self.col -1:
+                if self.land[x][y+1] == 2 or self.land[x][y+1] == 3 : return False
+        if x< self.row - 1:
+            if self.land[x+1][y] == 2 or self.land[x+1][y] == 3 : return False
+            if y>0 :
+                if self.land[x+1][y-1] == 2 or self.land[x+1][y-1] == 3 : return False
+            if y < self.col -1:
+                if self.land[x+1][y+1] == 2 or self.land[x+1][y+1] == 3 : return False
+
+
+        #On regarde à 2 cases si il n'y a pas de fast bot
+        #Pour les detail regarder le code source a engine.cpp fonction : bool Killbots::Engine::moveIsSafe
+        #On verifier les coins:
+        if x>0+1 and y>0+1:
+            if self.land[x-1][y-1] == 0 and self.land[x-2][y-2] == 3 :return False
+        if x>0+1 and y< self.col -2:
+            if self.land[x-1][y+1] == 0 and self.land[x-2][y+2] == 3 :return False
+        if x< self.row - 2 and y>0+1:
+            if self.land[x+1][y-1] == 0 and self.land[x+2][y-2] == 3 :return False
+        if x< self.row - 2 and y< self.col -2:
+            if self.land[x+1][y+1] == 0 and self.land[x+2][y+2] == 3 :return False
+        #On verifie les cotées:
+        # il faut que la case adjasente soit vide sinon le danger est deja detecté ou il s'agit d'un junk qui protegge
+        # Si il  y a un fastbot et au moins un autre robot (lent ou rapide) ils vont se collisioner
+        if x> 0+1 and self.land[x-1][y]==0:
+            robot=0
+            fbot=0
+            if y>0:
+                if self.land[x-2][y-1] == 3 : fbot +=1
+                if self.land[x-2][y-1] == 2 : robot +=1
+            if self.land[x-2][y] == 3 : fbot +=1
+            if self.land[x-2][y] == 2 : robot +=1          
+            if y < self.col -1 :
+                if self.land[x-2][y+1] == 3 : fbot +=1
+                if self.land[x-2][y+1] == 2 : robot +=1
+            if fbot ==1 and robot ==0 return False
+        if x < self.row -2 and self.land[x+1][y]==0:
+            robot=0
+            fbot=0
+            if y>0:
+                if self.land[x+2][y-1] == 3 : fbot +=1
+                if self.land[x+2][y-1] == 2 : robot +=1
+            if self.land[x+2][y] == 3 : fbot +=1
+            if self.land[x+2][y] == 2 : robot +=1          
+            if y < self.col -1 :
+                if self.land[x+2][y+1] == 3 : fbot +=1
+                if self.land[x+2][y+1] == 2 : robot +=1
+            if fbot ==1 and robot ==0 return False
+                
+        if y> 0+1 and self.land[x][y-1]==0:
+            robot=0
+            fbot=0
+            if x>0:
+                if self.land[x-1][y-2] == 3 : fbot +=1
+                if self.land[x-1][y-2] == 2 : robot +=1
+            if self.land[x][y-2] == 3 : fbot +=1
+            if self.land[x][y-2] == 2 : robot +=1          
+            if x < self.row -1 :
+                if self.land[x+1][y-2] == 3 : fbot +=1
+                if self.land[x+1][y-2] == 2 : robot +=1
+            if fbot ==1 and robot ==0 return False
+        if y < self.col -2 and self.land[x][y+1]==0:
+            robot=0
+            fbot=0
+            if x>0:
+                if self.land[x-1][y+2] == 3 : fbot +=1
+                if self.land[x-1][y+2] == 2 : robot +=1
+            if self.land[x][y+2] == 3 : fbot +=1
+            if self.land[x][y+2] == 2 : robot +=1          
+            if y < self.col -1 :
+                if self.land[x+1][y+2] == 3 : fbot +=1
+                if self.land[x+1][y+2] == 2 : robot +=1
+            if fbot ==1 and robot ==0 return False
+        return True
+            
+        
 #Fonction de test
 def map_push1(a):
     a.land = numpy.zeros((a.row, a.col), dtype=numpy.uint8)
