@@ -36,7 +36,7 @@ class killbots:
 
         self.round = 1
         self.score = 0
-        self.energy = 5
+        self.energy = 50
         self.populate(self._initial_bot)
         self.isDead = False
         
@@ -118,6 +118,13 @@ class killbots:
 
         if action == 10 :
             x,y = self.empty_rnd_cell()
+            self.land[self.hx][self.hy] = 0
+            self.hx = x
+            self.hy = y
+            self.land[x][y] = 1
+
+        elif action == 11 :
+            x,y = self.teleport_safely()
             self.land[self.hx][self.hy] = 0
             self.hx = x
             self.hy = y
@@ -242,7 +249,7 @@ class killbots:
         #Ainsi on ne se teleporte pas a la meme position
         if self.land[x][y] !=0 : return False
 
-        #On regarde à 1 case de distance si il n'y a pas de bot
+        #On regarde 'a 1 case de distance si il n'y a pas de bot
         if x>0 : 
             if self.land[x-1][y] == 2 or self.land[x-1][y] == 3 : return False
             if y>0 :
@@ -261,7 +268,7 @@ class killbots:
                 if self.land[x+1][y+1] == 2 or self.land[x+1][y+1] == 3 : return False
 
 
-        #On regarde à 2 cases si il n'y a pas de fast bot
+        #On regarde 'a 2 cases si il n'y a pas de fast bot
         #Pour les detail regarder le code source a engine.cpp fonction : bool Killbots::Engine::moveIsSafe
         #On verifier les coins:
         if x>0+1 and y>0+1:
@@ -272,8 +279,8 @@ class killbots:
             if self.land[x+1][y-1] == 0 and self.land[x+2][y-2] == 3 :return False
         if x< self.row - 2 and y< self.col -2:
             if self.land[x+1][y+1] == 0 and self.land[x+2][y+2] == 3 :return False
-        #On verifie les cotées:
-        # il faut que la case adjasente soit vide sinon le danger est deja detecté ou il s'agit d'un junk qui protegge
+        #On verifie les cotees:
+        # il faut que la case adjasente soit vide sinon le danger est deja detecte ou il s'agit d'un junk qui protegge
         # Si il  y a un fastbot et au moins un autre robot (lent ou rapide) ils vont se collisioner
         if x> 0+1 and self.land[x-1][y]==0:
             robot=0
@@ -286,7 +293,7 @@ class killbots:
             if y < self.col -1 :
                 if self.land[x-2][y+1] == 3 : fbot +=1
                 if self.land[x-2][y+1] == 2 : robot +=1
-            if fbot ==1 and robot ==0 return False
+            if fbot ==1 and robot ==0 : return False
         if x < self.row -2 and self.land[x+1][y]==0:
             robot=0
             fbot=0
@@ -298,7 +305,7 @@ class killbots:
             if y < self.col -1 :
                 if self.land[x+2][y+1] == 3 : fbot +=1
                 if self.land[x+2][y+1] == 2 : robot +=1
-            if fbot ==1 and robot ==0 return False
+            if fbot ==1 and robot ==0 : return False
                 
         if y> 0+1 and self.land[x][y-1]==0:
             robot=0
@@ -311,7 +318,7 @@ class killbots:
             if x < self.row -1 :
                 if self.land[x+1][y-2] == 3 : fbot +=1
                 if self.land[x+1][y-2] == 2 : robot +=1
-            if fbot ==1 and robot ==0 return False
+            if fbot ==1 and robot ==0 : return False
         if y < self.col -2 and self.land[x][y+1]==0:
             robot=0
             fbot=0
@@ -320,10 +327,10 @@ class killbots:
                 if self.land[x-1][y+2] == 2 : robot +=1
             if self.land[x][y+2] == 3 : fbot +=1
             if self.land[x][y+2] == 2 : robot +=1          
-            if y < self.col -1 :
+            if x < self.col -1 :
                 if self.land[x+1][y+2] == 3 : fbot +=1
                 if self.land[x+1][y+2] == 2 : robot +=1
-            if fbot ==1 and robot ==0 return False
+            if fbot ==1 and robot ==0 : return False
         return True
             
         
@@ -337,9 +344,20 @@ def map_push1(a):
     a.land[6][9] = 2
     a.land[0][8] = 2   
 
+def map_teleport(a):
+    a.land = numpy.zeros((a.row, a.col), dtype=numpy.uint8)
+    a.land[a.row/2][a.col/2] = 1
+    a.hx = a.row / 2
+    a.hy = a.col / 2
+    a.land[6][7] = 2
+    a.land[6][9] = 2
+    a.land[0][8] = 2
+    a.land[1][1] = 3
+    a.land[2][5] = 3
+    
 def main():
     a = killbots()
-    map_push1(a)
+    map_teleport(a)
     print a.land
     while not(a.isDead):
         print "----------------------------"
