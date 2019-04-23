@@ -37,7 +37,9 @@ class killbots:
         self.round = 1
         self.score = 0
         self.energy = 50
-        self.populate(self._initial_bot)
+        self.N_bot = self._initial_bot
+        self.N_fbot = self._initial_fastbot
+        self.populate()
         self.isDead = False
         
 
@@ -76,17 +78,21 @@ class killbots:
 
         return False
             
-    def populate(self, N_bot):
+    def populate(self):
         self.land = numpy.zeros((self.row, self.col),
                                 dtype=numpy.uint8)
         self.land[self.row/2][self.col/2] = 1
         self.hx = self.row / 2
         self.hy = self.col / 2
         
-        for _ in range(N_bot):
+        for _ in range(self.N_bot):
             x,y = self.empty_rnd_cell()
             self.land[x][y] = 2
-        #Fastbot plus tard
+        for _ in range(self.N_fbot):
+            x,y = self.empty_rnd_cell()
+            self.land[x][y] = 3
+        self.N_bot += 2
+        self.N_fbot += 2
 
 
     def action(self, action):
@@ -159,7 +165,7 @@ class killbots:
                 if self.energy< self._max_energy == 12:
                     self.energy += 1
                 else :
-                    self.score += _energy_points
+                    self.score += self._energy_points
                 
             while ( abs(x) > 0 or abs(y) > 0):
                 self.land[self.hx+x][self.hy+y] = self.land[self.hx+x-mx][self.hy+y-my]
@@ -377,8 +383,15 @@ class killbots:
     def play(self):
         self.update_display()
         while not(self.isDead):
-            self.action(self.get_action())    
+            if self.action(self.get_action()) == 2:
+                self.populate()
             self.update_display()
+
+
+class killbots_ai(killbots):
+
+    def get_action(self):
+        return numpy.random.randint(0, 13)
         
         
 #Fonction de test
@@ -404,6 +417,7 @@ def map_teleport(a):
     
 def main():
     a = killbots()
+    #a = killbots_ai()
     #    map_teleport(a)
     a.play()
 
