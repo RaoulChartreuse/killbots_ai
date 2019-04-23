@@ -89,7 +89,7 @@ class killbots:
         #Fastbot plus tard
 
 
-    def play(self, action):
+    def action(self, action):
         """Play a round of game, need an action
         Return 1 if hero is still alive
         Return 0 if hero is dead
@@ -107,6 +107,7 @@ class killbots:
         9 = wait
         10 = teleport
         11 = teleport safely
+        12 = do nothing 
         """
 
         #Bounded move
@@ -123,12 +124,15 @@ class killbots:
             self.hy = y
             self.land[x][y] = 1
 
-        elif action == 11 :
+        elif action == 11 and self.energy>0 :
+            self.energy -= 1
             x,y = self.teleport_safely()
             self.land[self.hx][self.hy] = 0
             self.hx = x
             self.hy = y
             self.land[x][y] = 1
+        elif action == 9:
+            return self.wait()
         
         mx=0
         if isUp(action) : mx=-1
@@ -170,8 +174,12 @@ class killbots:
 
         
         self.move_bot()
-        
-        if self.isDead : return 0
+        self.move_bot(True)
+
+        if self.isDead :
+            if self.count_bot() == 0 :
+                return 2
+            return 0
         else :return 1
   
 
@@ -332,7 +340,46 @@ class killbots:
                 if self.land[x+1][y+2] == 2 : robot +=1
             if fbot ==1 and robot ==0 : return False
         return True
-            
+
+    def count_bot(self):
+        n=0
+        n+= numpy.count_nonzero( numpy.where( self.land == 2,1, 0))
+        n+= numpy.count_nonzero( numpy.where( self.land == 3,1, 0))
+        return n
+    
+    def wait(self):
+        N_bot_initial = self.count_bot()
+        while True:
+            self.move_bot()
+            self.move_bot(True)        
+            if self.isDead : return 0
+            N_bot = self.count_bot()
+            if N_bot == 0:
+                break
+        self.energy = max(self._max_energy, self.energy+N_bot_initial)
+        return 2 #Possiblement 2
+
+
+    def get_action(self):
+        print "----------------------------"
+        print "Action :"
+        action = -1 
+        while action<0 or  action > 12  :
+            action = input("Action ?")        
+        return action
+
+    def update_display(self):
+        print "_____________________________"
+        print self.land
+        print "Score : ", self.score, "  | Energy :", self.energy
+        print "-----------------------------"
+    
+    def play(self):
+        self.update_display()
+        while not(self.isDead):
+            self.action(self.get_action())    
+            self.update_display()
+        
         
 #Fonction de test
 def map_push1(a):
@@ -357,15 +404,8 @@ def map_teleport(a):
     
 def main():
     a = killbots()
-    map_teleport(a)
-    print a.land
-    while not(a.isDead):
-        print "----------------------------"
-        print "Action :"
-        action = input("Action ?")
-        a.play(action)    
-        print a.land
-        print "Score : ", a.score, "  | Energy :", a.energy
+    #    map_teleport(a)
+    a.play()
 
 if __name__ == "__main__":
     # execute only if run as a script
