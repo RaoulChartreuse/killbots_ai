@@ -219,13 +219,10 @@ class killbots:
         for xy in keep_item :
             new_land[xy[0]][xy[1]] = self.land[xy[0]][xy[1]]
 
-        print new_land
-        print bot_xy
+
         for xy in bot_xy:
-            print xy, xy[0], xy[1], "  :",
             mx = xy[0] + numpy.sign(self.hx-xy[0])
             my = xy[1] + numpy.sign(self.hy-xy[1])
-            print mx, " , ", my 
                       
             if new_land[mx][my] > 0 :
                 if new_land[mx][my] == 1 :
@@ -426,12 +423,12 @@ class killbots:
                 self.populate()
             self.update_display()
 
-
+"""
 class killbots_ai(killbots):
 
     def get_action(self):
         return numpy.random.randint(0, 13)
-        
+"""        
         
 #Fonction de test
 def map_push1(a):
