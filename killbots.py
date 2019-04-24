@@ -15,6 +15,21 @@ def isRight(action):
 class killbots:
     """PLay a game of killbots
     """
+    _mouv = [ "0 : up left",
+              "1 :  up",
+              "2 : up right",
+              "3 : left",
+              "4 : do nothing",
+              "5 : right",
+              "6 : down left",
+              "7 : down",
+              "8 : down right",
+              "9 : wait",
+              "10 : teleport",
+              "11 : teleport safely",
+              "12 : do nothing "
+    ]
+    
     _max_energy = 12
     _bot_points = 5
     _fastbot_points = 10
@@ -366,11 +381,35 @@ class killbots:
         return 2 #Possiblement 2
 
 
+    def check_action(self, action):
+        if ((isUp(action)  and self.hx == 0 )
+            or (isDown(action) and self.hx == self.row-1)
+            or (isLeft(action) and action<9 and self.hy == 0 )
+            or (isRight(action) and action<9 and self.hy == self.col-1)
+        ) : return False
+        
+        mx=0
+        if isUp(action) : mx=-1
+        if isDown(action) : mx = 1
+        my=0
+        if isLeft(action) : my = -1
+        if isRight(action) : my = 1
+        if self.land[self.hx+mx][self.hy+my]==4: return True
+        return self.safe_teleport(self.hx+mx, self.hy+my )
+        
+    
     def get_action(self):
         print "----------------------------"
         print "Action :"
-        action = -1 
-        while action<0 or  action > 12  :
+        action = -1
+        action_possible = range(13)
+        for i in range(9):#ON ne verifie que les mouvements directs
+            if not self.check_action(i) :
+                action_possible.remove(i)
+        if self.energy == 0 : action_possible.remove(11)
+        while action_possible.count(action) !=1 :
+            for i in action_possible: print self._mouv[i]
+            
             action = input("Action ?")        
         return action
 
