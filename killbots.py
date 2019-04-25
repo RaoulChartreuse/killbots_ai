@@ -38,8 +38,8 @@ class killbots:
     _initial_fastbot = -2
 
     def __init__(self, row = 16, col = 16, graph = True):
-        self.hx = row / 2
-        self.hy = col / 2
+        self.hx = row // 2
+        self.hy = col // 2
         self.row = row
         self.col = col
         #Codage de la map
@@ -96,9 +96,9 @@ class killbots:
     def populate(self):
         self.land = numpy.zeros((self.row, self.col),
                                 dtype=numpy.uint8)
-        self.land[self.row/2][self.col/2] = 1
-        self.hx = self.row / 2
-        self.hy = self.col / 2
+        self.land[self.row//2][self.col//2] = 1
+        self.hx = self.row // 2
+        self.hy = self.col // 2
         
         for _ in range(self.N_bot):
             x,y = self.empty_rnd_cell()
@@ -396,25 +396,25 @@ class killbots:
         
     
     def get_action(self):
-        print "----------------------------"
-        print "Action :"
+        print("----------------------------")
+        print("Action :")
         action = -1
-        action_possible = range(13)
+        action_possible = list(range(13))
         for i in range(9):#ON ne verifie que les mouvements directs
             if not self.check_action(i) :
                 action_possible.remove(i)
         if self.energy == 0 : action_possible.remove(11)
         while action_possible.count(action) !=1 :
-            for i in action_possible: print self._mouv[i]
+            for i in action_possible: print(self._mouv[i])
             
-            action = input("Action ?")        
+            action = int(input("Action ?"))
         return action
 
     def update_display(self):
-        print "_____________________________"
-        print self.land
-        print "Score : ", self.score, "  | Energy :", self.energy
-        print "-----------------------------"
+        print ("_____________________________")
+        print (self.land)
+        print ("Score : ", self.score, "  | Energy :", self.energy)
+        print ("-----------------------------")
     
     def play(self):
         self.update_display()
