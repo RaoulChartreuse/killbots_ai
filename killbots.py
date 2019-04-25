@@ -198,10 +198,12 @@ class killbots:
         self.move_bot(True)
 
         if self.isDead :
+            return 0
+        else :
             if self.count_bot() == 0 :
                 return 2
-            return 0
-        else :return 1
+
+            return 1
   
 
     
