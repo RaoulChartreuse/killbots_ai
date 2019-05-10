@@ -85,13 +85,7 @@ class Killapp(QWidget, killbots.killbots):
         
 
         grid.addLayout(move_bar)
-        """
 
-        9 = wait
-        10 = teleport
-        11 = teleport safely
-        12 = do nothing 
-        """
         
         self.setLayout(grid)
         
