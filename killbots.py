@@ -84,8 +84,8 @@ class killbots:
         if isRight(action) : my = 1
         x,y = mx, my
         
-        while(self.land[self.hx+x][self.hy+y] == 4
-              and  self.is_in_bord(self.hx+x,self.hy+y)):
+        while(self.is_in_bord(self.hx+x,self.hy+y)
+              and  self.land[self.hx+x][self.hy+y] == 4):
             x += mx
             y += my
         if (self.is_in_bord(self.hx+x, self.hy+y)):
