@@ -10,14 +10,27 @@ import killbots
 import numpy
 
 
+class qt_killbots(killbots.killbots):
+    
+    def __init__(self):
+        super().__init__()
 
+    def update_display(self):
+        pass
+
+
+    
 square_size = 40
 
-class Killapp(QWidget, killbots.killbots):
+class Killapp(QWidget):
 
+
+    
+    
     def __init__(self):
         super().__init__()
         self.setWindowIcon(QtGui.QIcon("images/bot.png"))
+        self.killbots = qt_killbots()
         self.initUI()
 
     def initUI(self):      
@@ -29,7 +42,7 @@ class Killapp(QWidget, killbots.killbots):
         top_bar = QHBoxLayout()
  
 
-        self.text_energy = "Energy : "+ str(self.energy)
+        self.text_energy = "Energy : "+ str(self.killbots.energy)
         self.label_energy = QLabel(self.text_energy, self)
         top_bar.addWidget(self.label_energy, Qt.AlignTop)       
 
@@ -46,9 +59,9 @@ class Killapp(QWidget, killbots.killbots):
         grid = QVBoxLayout(self)
         grid.addLayout(top_bar)
         
-        self.text_main = "main surface, ready \n to be ufllfd"
+        self.text_main = ""
         self.label_main = QLabel(self.text_main, self)
-        self.label_main.setFixedSize(self.col*square_size, self.row*square_size)
+        self.label_main.setFixedSize(self.killbots.col*square_size, self.killbots.row*square_size)
         grid.addWidget(self.label_main, Qt.AlignBottom)  
 
 
@@ -70,7 +83,6 @@ class Killapp(QWidget, killbots.killbots):
         
 
         move_bar.addWidget(b_ul)
-        #b_ul.clicked.connect(self.c_ul)
         move_bar.addWidget(b_u)
         move_bar.addWidget(b_ur)
         move_bar.addWidget(b_l)
@@ -82,7 +94,17 @@ class Killapp(QWidget, killbots.killbots):
         move_bar.addWidget(b_t)
         move_bar.addWidget(b_ts)
         move_bar.addWidget(b_n)
-        
+
+
+        b_ul.clicked.connect(self.c_ul)
+        b_u.clicked.connect(self.c_u)
+        b_ur.clicked.connect(self.c_ur)
+        b_l.clicked.connect(self.c_l)
+        b_r.clicked.connect(self.c_r)
+        b_dl.clicked.connect(self.c_dl)
+        b_d.clicked.connect(self.c_d)
+        b_dr.clicked.connect(self.c_dr)
+
 
         grid.addLayout(move_bar)
 
@@ -94,8 +116,39 @@ class Killapp(QWidget, killbots.killbots):
         self.show()
 
 
+    def c_ul(self):
+        self.killbots.action(0)
+        self.update()
+        
+    def c_u(self):
+        self.killbots.action(1)
+        self.update()
 
+    def c_ur(self):
+        self.killbots.action(2)
+        self.update()
 
+    def c_l(self):
+        self.killbots.action(3)
+        self.update()
+
+    def c_r(self):
+        self.killbots.action(5)
+        self.update()
+
+    def c_dl(self):
+        self.killbots.action(6)
+        self.update()
+        
+    def c_d(self):
+        self.killbots.action(7)
+        self.update()
+
+    def c_dr(self):
+        self.killbots.action(8)
+        self.update()
+        
+        
     def paintEvent(self, event):
         painter = QPainter(self)
         #p.setRenderHint(QPainter.Antialiasing)
@@ -109,16 +162,16 @@ class Killapp(QWidget, killbots.killbots):
 
         #Tracer des col
         painter.drawLine(rec.x(), rec.y(), rec.x(), rec.y()+rec.height())
-        dx = rec.width() // self.col #il peut manquer un pixel avec les divisions
-        for i in range(self.col):
+        dx = rec.width() // self.killbots.col #il peut manquer un pixel avec les divisions
+        for i in range(self.killbots.col):
             j=i+1
             painter.drawLine(rec.x() + j*dx, rec.y(),
                              rec.x() + j*dx, rec.y()+rec.height())
 
         #Tracer des row
         painter.drawLine(rec.x(), rec.y(), rec.x() + rec.width(), rec.y())
-        dy = rec.height() // self.col #il peut manquer un pixel avec les divisions
-        for i in range(self.row):
+        dy = rec.height() // self.killbots.row #il peut manquer un pixel avec les divisions
+        for i in range(self.killbots.row):
             j=i+1
             painter.drawLine(rec.x(), rec.y() + j*dy,
                              rec.x() + rec.width(), rec.y() + j*dy)
@@ -126,17 +179,17 @@ class Killapp(QWidget, killbots.killbots):
         source = QRect(0,0,48,48)
 
 
-        for i in range(self.row) :
-            for j in range(self.col):
-                if self.land[i][j] !=0 :
-                    target = QRect(rec.x()+i*dx, rec.y()+j*dy, dx, dy)
-                    if self.land[i][j] == 1 :
+        for i in range(self.killbots.row) :
+            for j in range(self.killbots.col):
+                if self.killbots.land[i][j] !=0 :
+                    target = QRect(rec.x()+j*dx, rec.y()+i*dy, dx, dy)
+                    if self.killbots.land[i][j] == 1 :
                         painter.drawPixmap(target, self.IMG_HERO, source)
-                    if self.land[i][j] == 2 :
+                    if self.killbots.land[i][j] == 2 :
                         painter.drawPixmap(target, self.IMG_BOT, source)
-                    if self.land[i][j] == 3 :
+                    if self.killbots.land[i][j] == 3 :
                         painter.drawPixmap(target, self.IMG_FASTBOT, source)
-                    if self.land[i][j] == 4 :
+                    if self.killbots.land[i][j] == 4 :
                         painter.drawPixmap(target, self.IMG_JUNK, source)
         
 
