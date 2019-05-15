@@ -14,7 +14,7 @@ class qt_killbots(killbots.killbots):
     
     def __init__(self):
         super().__init__()
-
+        
     def update_display(self):
         pass
 
@@ -49,6 +49,7 @@ class Killapp(QWidget):
 
         b_bot = QPushButton(QtGui.QIcon("images/hero.png"),"")
         top_bar.addWidget(b_bot, Qt.AlignTop)
+        b_bot.clicked.connect(self.c_reset)
 
         
         self.text_score = "Score : 0"
@@ -104,7 +105,11 @@ class Killapp(QWidget):
         b_dl.clicked.connect(self.c_dl)
         b_d.clicked.connect(self.c_d)
         b_dr.clicked.connect(self.c_dr)
-
+        b_w.clicked.connect(self.c_w)
+        b_t.clicked.connect(self.c_t)
+        b_ts.clicked.connect(self.c_ts)
+        b_n .clicked.connect(self.c_n)
+        
 
         grid.addLayout(move_bar)
 
@@ -115,40 +120,33 @@ class Killapp(QWidget):
         self.setWindowTitle('kILL BOTS')
         self.show()
 
-
-    def c_ul(self):
-        self.killbots.action(0)
+    def make_action(self, action):
+        #Test move ??
+        res = self.killbots.action(action)
+        if res == 2:
+            self.killbots.populate()
+        #Check dead
         self.update()
         
-    def c_u(self):
-        self.killbots.action(1)
-        self.update()
 
-    def c_ur(self):
-        self.killbots.action(2)
-        self.update()
-
-    def c_l(self):
-        self.killbots.action(3)
-        self.update()
-
-    def c_r(self):
-        self.killbots.action(5)
-        self.update()
-
-    def c_dl(self):
-        self.killbots.action(6)
-        self.update()
+    def c_ul(self): self.make_action(0)
+    def c_u(self): self.make_action(1)
+    def c_ur(self): self.make_action(2)
+    def c_l(self): self.make_action(3)
+    def c_r(self): self.make_action(5)
+    def c_dl(self): self.make_action(6)
+    def c_d(self): self.make_action(7)
+    def c_dr(self): self.make_action(8)
+    def c_w(self): self.make_action(9)
+    def c_t(self): self.make_action(10)
+    def c_ts(self): self.make_action(11)
+    def c_n(self): self.make_action(12)
         
-    def c_d(self):
-        self.killbots.action(7)
+    def c_reset(self):
+        self.killbots.__init__()
         self.update()
 
-    def c_dr(self):
-        self.killbots.action(8)
-        self.update()
-        
-        
+    
     def paintEvent(self, event):
         painter = QPainter(self)
         #p.setRenderHint(QPainter.Antialiasing)
@@ -191,7 +189,11 @@ class Killapp(QWidget):
                         painter.drawPixmap(target, self.IMG_FASTBOT, source)
                     if self.killbots.land[i][j] == 4 :
                         painter.drawPixmap(target, self.IMG_JUNK, source)
-        
+
+        self.text_energy = "Energy : "+ str(self.killbots.energy)
+        self.label_energy.setText(self.text_energy)
+        self.text_score = "Score : "+ str(self.killbots.score)
+        self.label_score.setText(self.text_score)
 
 if __name__ == '__main__':
     
