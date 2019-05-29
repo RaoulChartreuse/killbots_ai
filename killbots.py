@@ -37,7 +37,7 @@ class killbots:
     _initial_bot = 8
     _initial_fastbot = -2
 
-    def __init__(self, row = 16, col = 16, graph = True):
+    def __init__(self, row = 16, col = 16):
         self.hx = row // 2
         self.hy = col // 2
         self.row = row

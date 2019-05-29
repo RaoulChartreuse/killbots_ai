@@ -3,6 +3,7 @@ import numpy
 import matplotlib.pyplot as plt
 from scipy import stats  
 import time
+import cProfile
 
 class killbots_ai(killbots.killbots):
 
@@ -31,8 +32,12 @@ class killbots_ai(killbots.killbots):
 
 def main():
     a = killbots_ai()
-    start_time = time.time()  
-    res = a.play_n_games(5000)
+    start_time = time.time()
+    pr = cProfile.Profile()
+    pr.enable()
+    res = a.play_n_games(1000000)
+    pr.disable()
+    pr.print_stats()
     interval = time.time() - start_time
     print (interval, "s")
     print ("Moyenne :", numpy.mean(res))

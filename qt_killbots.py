@@ -12,11 +12,12 @@ import numpy
 
 class qt_killbots(killbots.killbots):
     
-    def __init__(self):
+    def __init__(self, update):
         super().__init__()
+        self.update= update()
         
     def update_display(self):
-        pass
+        self.update()
 
 
     
@@ -30,7 +31,7 @@ class Killapp(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowIcon(QtGui.QIcon("images/bot.png"))
-        self.killbots = qt_killbots()
+        self.killbots = qt_killbots(self.update)
         self.initUI()
 
     def initUI(self):      
@@ -143,7 +144,7 @@ class Killapp(QWidget):
     def c_n(self): self.make_action(12)
         
     def c_reset(self):
-        self.killbots.__init__()
+        self.killbots.__init__(self.update)
         self.update()
 
     
